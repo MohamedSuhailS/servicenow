@@ -6,6 +6,10 @@ const FoodSchema = new mongoose.Schema({
     trim: true,
     lowercase: true,
   },
+  img: {
+    data: Buffer,
+    contentType: String,
+  },
   message: {
     type: String,
     required: true,

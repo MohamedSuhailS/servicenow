@@ -4,9 +4,10 @@ const app = express();
 require('dotenv').config();
 const route = express.Router();
 const foodModel = require("./channel");
+const userModel = require("./imgchannel");
 const PORT = 3000;
 const multer = require('multer');
-const dbUrl=process.env.MONGO_URI
+const dbUrl=process.env.MONGO_URI 
 const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // Body parser use JSON data
@@ -111,42 +112,75 @@ app.post("/add", function(req, res) {
 
 
 const path = require('path');
+// const storage = multer.diskStorage({
+//   destination: path.join(__dirname, './public/', 'uploads'),
+//   filename: function (req, file, cb) {   
+//       // null as first argument means no error
+//       cb(null, Date.now() + '-' + file.originalname )  
+//   }
+// })
+
+// app.post('/imageupload', async (req, res) => {	
+//   try {
+//       // 'avatar' is the name of our file input field in the HTML form
+
+//       let upload = multer({ storage: storage}).single('avatar');
+
+//       upload(req, res, function(err) {
+//           // req.file contains information of uploaded file
+//           // req.body contains information of text fields
+
+//           if (!req.file) {
+//               return res.send('Please select an image to upload');
+//           }
+//           else if (err instanceof multer.MulterError) {
+//               return res.send(err);
+//           }
+//           else if (err) {
+//               return res.send(err);
+//           }
+
+//           const classifiedsadd = {
+//       image: req.file.filename
+//     };
+//     console.log(classifiedsadd)
+//       res.json({ success: 1 })       
+//       }); 
+//   }catch (err) {console.log(err)}
+// })
+const fs = require("fs");
 const storage = multer.diskStorage({
-  destination: path.join(__dirname, './public/', 'uploads'),
-  filename: function (req, file, cb) {   
-      // null as first argument means no error
-      cb(null, Date.now() + '-' + file.originalname )  
-  }
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+const upload = multer({ storage: storage });
+
+app.post("/img", upload.single("photo"), (req, res) => {
+  const saveImage =  userModel({
+    name: req.body.name,
+    img: {
+      data: fs.readFileSync("uploads/" + req.file.filename),
+      contentType: "image/png",
+    }
+  });
+  saveImage
+    .save()
+    .then((res) => {
+      console.log("image is saved");
+    })
+    .catch((err) => {
+      console.log(err, "error has occur");
+    });
+    res.send('image is saved')
+});
+
+
+app.get('/img',async (req,res)=>{
+  const allData = await userModel.find()
+  res.json(allData)
 })
-
-app.post('/imageupload', async (req, res) => {	
-  try {
-      // 'avatar' is the name of our file input field in the HTML form
-
-      let upload = multer({ storage: storage}).single('avatar');
-
-      upload(req, res, function(err) {
-          // req.file contains information of uploaded file
-          // req.body contains information of text fields
-
-          if (!req.file) {
-              return res.send('Please select an image to upload');
-          }
-          else if (err instanceof multer.MulterError) {
-              return res.send(err);
-          }
-          else if (err) {
-              return res.send(err);
-          }
-
-          const classifiedsadd = {
-      image: req.file.filename
-    };
-    console.log(classifiedsadd)
-      res.json({ success: 1 })       
-      }); 
-  }catch (err) {console.log(err)}
-})
-
-
 module.exports=route;
