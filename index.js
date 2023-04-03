@@ -5,6 +5,7 @@ require('dotenv').config();
 const route = express.Router();
 const foodModel = require("./channel");
 const PORT = 3000;
+const multer = require('multer');
 const dbUrl=process.env.MONGO_URI
 const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -56,9 +57,44 @@ app.post("/food", async (request, response) => {
     response.status(500).send(error);
   }
 });
-app.get("/foodi", async (request, response) => {
+app.post("/foodupdate", async (request, response) => {
+  console.log(request.body.name);
+  const food = new foodModel();
+    food.name = request.body.name
+    food.email = request.body.email
+    food.message = request.body.message
+    let data={
+      name:request.body.name,
+      email:request.body.email,
+      message:request.body.message
+    }
   try {
-   const food= await foodModel.findById("6422b2d1e74a330dc61b72b6");
+    const articles = await foodModel.findByIdAndUpdate(request.body.id, {  name:request.body.name,
+      email:request.body.email,
+      message:request.body.message})
+    response.send(articles);
+    console.log(articles);
+  } catch (error) {
+    response.status(500).send(error);
+  }
+});
+
+app.post("/fooddelete", async (request, response) => {
+  console.log(request.body.id);
+  try {
+    const articles = await foodModel.findByIdAndDelete(request.body.id);
+    response.send(articles);
+    console.log(articles);
+  } catch (err) {
+    console.log(err);
+  }
+
+
+});
+app.get("/foodi/:id", async (request, response) => {
+  console.log(request.params.id)
+  try {
+   const food= await foodModel.findById(request.params.id);
     response.send(food);
   } catch (error) {
     response.status(500).send(error);
@@ -72,4 +108,45 @@ app.post("/add", function(req, res) {
     
   res.send("Addition - " + result);
 });
+
+
+const path = require('path');
+const storage = multer.diskStorage({
+  destination: path.join(__dirname, './public/', 'uploads'),
+  filename: function (req, file, cb) {   
+      // null as first argument means no error
+      cb(null, Date.now() + '-' + file.originalname )  
+  }
+})
+
+app.post('/imageupload', async (req, res) => {	
+  try {
+      // 'avatar' is the name of our file input field in the HTML form
+
+      let upload = multer({ storage: storage}).single('avatar');
+
+      upload(req, res, function(err) {
+          // req.file contains information of uploaded file
+          // req.body contains information of text fields
+
+          if (!req.file) {
+              return res.send('Please select an image to upload');
+          }
+          else if (err instanceof multer.MulterError) {
+              return res.send(err);
+          }
+          else if (err) {
+              return res.send(err);
+          }
+
+          const classifiedsadd = {
+      image: req.file.filename
+    };
+    console.log(classifiedsadd)
+      res.json({ success: 1 })       
+      }); 
+  }catch (err) {console.log(err)}
+})
+
+
 module.exports=route;
