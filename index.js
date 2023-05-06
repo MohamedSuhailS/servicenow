@@ -11,8 +11,37 @@ const dbUrl=process.env.MONGO_URI
 const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // Body parser use JSON data
-  
+const {Builder, Browser, By, Key, until} = require('selenium-webdriver');
+require("chromedriver");
 
+const mysql = require('mysql');
+const conn = mysql.createConnection({
+    // host:'localhost',
+    // database:'blog_react',
+    // user: 'root',
+    // password:'password'
+    host:'166.62.28.130',
+    database:'testdbs',
+    user: 'taskdb',
+    password:'taskdb123@' 
+})
+
+conn.connect(function(error){
+    if(error){
+        throw error;
+    }
+    else{
+        console.log('Success');
+    }
+});
+
+app.get('/data',(req,res)=>{
+    const sql = 'SELECT * FROM blog_data';
+    conn.query(sql,(error,results)=>{
+        res.send(results);
+        console.log(results);
+     });
+});
 const connectionParams = {
     useNewUrlParser: true,
     useUnifiedTopology: true,};
@@ -44,6 +73,61 @@ app.get("/foods", async (request, response) => {
       response.status(500).send(error);
     }
   });
+  app.get("/sels/:name", async (request, response) => {
+    var name = request.params.name;
+    console.log(request.params.name)});
+  app.get("/sel/:name", async (request, response) => {
+    var name = request.params.name;
+    console.log(request.params.name)
+    // async function example() {
+    //   let driver = await new Builder().forBrowser(Browser.CHROME).build();
+    //   try {
+    //     await driver.get('https://www.google.com/');
+    //     await driver.findElement(By.name('q')).sendKeys('webdriver', Key.RETURN);
+    //     await driver.wait(until.titleIs('webdriver - Google Search'), 10000);
+    //   } finally {
+    //     await driver.quit();
+    //   }
+    // }
+    // example();
+    let suhail="";
+    let c=0;
+    var arr3 = [ 'Content-Marketing-Impact-On-Digital-Marketing-:-Is-Not-That-Difficult-As-You-Think','Google-Still-Rolling-Out-its-Mobile-First-Indexing'
+  ,'Google-analytics-:-New-Update-on-Data-Retention-Control'
+  ];
+   for(var i=0;i<3; await i++){
+      console.log(i)
+     
+      setTimeout( async function examples(i) {
+      let driver = await new Builder().forBrowser(Browser.CHROME).build();
+        await driver.get('https://www.smartladders.com/blog/'+arr3[i]);
+        var names =await driver.findElements(By.className("category"));
+      console.log("before"+names);
+        for(let n of names){
+          console.log("suhail"+i+await n.getText());
+          suhail = "Title:"+arr3[i]+"   " +"Category:"+ await n.getText();
+        } 
+        var fs = require("fs");
+        fs.appendFile("temp.txt", suhail+"\r\n", (err) => {
+          if (err) console.log(err);
+          console.log("Successfully Written to File.");
+        });
+        suhail="";
+        console.log( await "after"+suhail);
+       // await driver.wait(until.titleIs('chatgpt - Google Search'), 10000);
+     // } finally {
+        await driver.quit();
+        c++;
+     // }
+     if(c==3){
+      fs.readFile('temp.txt', 'utf8', function(err, data) {
+       response.send(data);
+      });
+     }
+    },10000 * i, i);
+
+  }
+});
   
 app.post("/food", async (request, response) => {
   console.log(request.body.name);
@@ -100,6 +184,12 @@ app.get("/foodi/:id", async (request, response) => {
   } catch (error) {
     response.status(500).send(error);
   }
+  var fs = require("fs");
+var data = "New File Contents";
+fs.writeFile("temp.txt", data, (err) => {
+  if (err) console.log(err);
+  console.log("Successfully Written to File.");
+});
 });
 app.post("/add", function(req, res) {
   var num1 = Number(req.body.num1);
