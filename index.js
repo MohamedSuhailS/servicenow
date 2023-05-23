@@ -67,37 +67,37 @@ app.use(bodyParser.json()); // Body parser use JSON data
 const {Builder, Browser, By, Key, until} = require('selenium-webdriver');
 require("chromedriver");
 
-const mysql = require('mysql');
-const conn = mysql.createConnection({
-    // host:'localhost',
-    // database:'blog_react',
-    // user: 'root',
-    // password:'password'
-    host:'166.62.28.130',
-    database:'testdbs',
-    user: 'taskdb',
-    password:'taskdb123@' 
-})
+// const mysql = require('mysql');
+// const conn = mysql.createConnection({
+//     // host:'localhost',
+//     // database:'blog_react',
+//     // user: 'root',
+//     // password:'password'
+//     host:'166.62.28.130',
+//     database:'testdbs',
+//     user: 'taskdb',
+//     password:'taskdb123@' 
+// })
 
-conn.connect(function(error){
-    if(error){
-        throw error;
-    }
-    else{
-        console.log('Success');
-    }
-});
+// conn.connect(function(error){
+//     if(error){
+//         throw error;
+//     }
+//     else{
+//         console.log('Success');
+//     }
+// });
 
-app.get('/data',(req,res)=>{
-    const sql = 'SELECT * FROM blog_data';
-    conn.query(sql,(error,results)=>{
-        res.send(results);
-       // console.log(results);
-     });
+// app.get('/data',(req,res)=>{
+//     const sql = 'SELECT * FROM blog_data';
+//     conn.query(sql,(error,results)=>{
+//         res.send(results);
+//        // console.log(results);
+//      });
 
-     let ress =  api.sendMessage('What is OpenAI?')
-     console.log(ress.text)
-});
+//      let ress =  api.sendMessage('What is OpenAI?')
+//      console.log(ress.text)
+// });
 const connectionParams = {
     useNewUrlParser: true,
     useUnifiedTopology: true,};
@@ -124,6 +124,7 @@ app.get("/foods", async (request, response) => {
     const foods = await foodModel.find({});
   
     try {
+      console.log(foods.length)
       response.send(foods);
     } catch (error) {
       response.status(500).send(error);
