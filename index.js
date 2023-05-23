@@ -119,7 +119,9 @@ app.use(cors())
 app.listen(PORT, () => {
     console.log(`Listening on POST: ${PORT}`);
 });
-
+app.get("/", async (request, response) => {
+      response.status(500).send("suhail");
+});
 app.get("/foods", async (request, response) => {
     const foods = await foodModel.find({});
   
